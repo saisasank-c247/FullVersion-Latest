@@ -91,13 +91,14 @@ if (themeConfig.routingLoader) {
 }
 
 const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
-  if (guestGuard) {
-    return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>
-  } else if (!guestGuard && !authGuard) {
-    return <>{children}</>
-  } else {
-    return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>
-  }
+  return <>{children}</>
+  // if (guestGuard) {
+  //   return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>
+  // } else if (!guestGuard && !authGuard) {
+  //   return <>{children}</>
+  // } else {
+  //   return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>
+  // }
 }
 
 // ** Configure JSS & ClassName
@@ -141,7 +142,6 @@ const App = (props: ExtendedAppProps) => {
                         {getLayout(<Component {...pageProps} />)}
                       </AclGuard>
                     </Guard>
-                    {/* {getLayout(<Component {...pageProps} />)} */}
                     <ReactHotToast>
                       <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
                     </ReactHotToast>

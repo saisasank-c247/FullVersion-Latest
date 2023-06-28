@@ -61,6 +61,13 @@ export type ProjectTableRowType = {
   avatarGroup: string[]
   avatarColor?: ThemeColor
 }
+
+export type UserableRowType = {
+  id: number
+  name: string
+  email: string
+}
+
 export type ProfileHeaderType = {
   fullName: string
   coverImg: string

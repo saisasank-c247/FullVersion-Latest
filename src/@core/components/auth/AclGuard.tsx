@@ -43,6 +43,7 @@ const AclGuard = (props: AclGuardProps) => {
   let ability: AppAbility
 
   useEffect(() => {
+    console.log({ auth, guestGuard, router })
     if (auth.user && auth.user.role && !guestGuard && router.route === '/') {
       const homeRoute = getHomeRoute(auth.user.role)
       router.replace(homeRoute)
@@ -57,6 +58,8 @@ const AclGuard = (props: AclGuardProps) => {
     }
   }
 
+  return <>{children}</>
+
   // If guest guard or no guard is true or any error page
   if (guestGuard || router.route === '/404' || router.route === '/500' || !authGuard) {
     // If user is logged in and his ability is built
@@ -68,6 +71,7 @@ const AclGuard = (props: AclGuardProps) => {
     }
   }
 
+  
   // Check the access of current user and render pages
   if (ability && auth.user && ability.can(aclAbilities.action, aclAbilities.subject)) {
     if (router.route === '/') {

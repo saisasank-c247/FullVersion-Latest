@@ -44,6 +44,11 @@ const navigation = (): HorizontalNavItemsType => {
           path: '/apps/calendar'
         },
         {
+          title: 'Image Generator',
+          icon: 'tabler:calendar',
+          path: '/apps/image-generator'
+        },
+        {
           title: 'Invoice',
           icon: 'tabler:file-dollar',
           children: [

@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.use("/admin", AdminRoutes);
 router.use("/auth", AuthRoutes);
-router.use("/events", EventRoutes)
+router.use("/events", EventRoutes);
 
 export default router;

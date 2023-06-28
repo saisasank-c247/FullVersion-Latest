@@ -1,738 +1,176 @@
-import React, { useContext, useEffect, useState } from "react";
-import PropTypes from "prop-types";
-// import { isEmpty } from "lodash";
+// ** React Imports
+import { useEffect, useState } from 'react'
 
+// ** MUI Imports
+import Box from '@mui/material/Box'
+import { Theme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
+
+// ** Redux Imports
+import { useDispatch, useSelector } from 'react-redux'
+
+// ** Hooks
+import { useSettings } from 'src/@core/hooks/useSettings'
+
+// ** Types
+import { RootState, AppDispatch } from 'src/store'
+import { CalendarColors, CalendarFiltersType } from 'src/types/apps/calendarTypes'
+
+// ** FullCalendar & App Components Imports
+import Calendar from 'src/views/apps/calendar/Calendar'
+import SidebarLeft from 'src/views/apps/calendar/SidebarLeft'
+import CalendarWrapper from 'src/@core/styles/libs/fullcalendar'
+import AddEventSidebar from 'src/views/apps/calendar/AddEventSidebar'
+
+// ** Actions
 import {
-  Button,
-  Card,
-  CardBody,
-  Col,
-  Container,
-  Form,
-  FormFeedback,
-  Input,
-  Label,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  Row,
-} from "reactstrap";
-import * as Yup from "yup";
-import { useFormik } from "formik";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin, { Draggable } from "@fullcalendar/interaction";
-import BootstrapTheme from "@fullcalendar/bootstrap";
+  addEvent,
+  fetchEvents,
+  deleteEvent,
+  updateEvent,
+  handleSelectEvent,
+  handleAllCalendars,
+  handleCalendarsUpdate
+} from 'src/store/apps/calendar'
+import { addCalendarData1, deleteCalendarData, loadCalendarEvents, updateCalendarData } from './CalendarService'
 
-//Import Breadcrumb
-import Breadcrumbs from "../../components/Common/Breadcrumb";
+// ** CalendarColors
+const calendarsColor: CalendarColors = {
+  Personal: 'error',
+  Business: 'primary',
+  Family: 'warning',
+  Holiday: 'success',
+  ETC: 'info'
+}
 
-//import Images
-import verification from "../../assets/images/verification-img.png";
+const AppCalendar = () => {
+  // ** States
+  const [calendarApi, setCalendarApi] = useState<null | any>(null)
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState<boolean>(false)
+  const [addEventSidebarOpen, setAddEventSidebarOpen] = useState<boolean>(false)
+  const [calendarEvents, setCalenderEvents] = useState<any>(null)
 
-import {
-  addNewEvent as onAddNewEvent,
-  deleteEvent as onDeleteEvent,
-  getCategories as onGetCategories,
-  getEvents as onGetEvents,
-  updateEvent as onUpdateEvent,
-} from "../../store/actions";
+  // ** Hooks
+  const { settings } = useSettings()
+  const dispatch = useDispatch<AppDispatch>()
+  const store = useSelector((state: RootState) => state.calendar)
 
-import DeleteModal from "./DeleteModal";
-
-//css
-import "@fullcalendar/bootstrap/main.css";
-
-//redux
-import { useDispatch, useSelector } from "react-redux";
-import { addCalendarData1,deleteCalendarData, loadCalendarEvents, updateCalendarData } from "./CalendarService";
-
-
-const token = localStorage.getItem("authUser") ? JSON.parse(localStorage.getItem("authUser")).token : '';
-const Calender = props => {
-
-  const config = {
-    headers: { Authorization: token }
-  };
-  //meta title
-  document.title = "Calendar | LMS Bank - React Admin & Dashboard Template";
-
-  const dispatch = useDispatch();
-  const [apiData, setApiData] = useState([]);
-  const [event, setEvent] = useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-  
-  const [addCalendarData, setAddCalendarData] = useState({
-    title: "",
-    from_date: "",
-    to_date: ""
-  })
-
-  const [editCalendarData, setEditCalendarData] = useState({
-    _id: "",
-    title: "",
-    from_date: "",
-    to_date: ""
-  });
-  // events validation
-  const validation = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
-    enableReinitialize: true,
-    initialValues: {
-      title: (event && event.title) || '',
-      from_date: (event && event.start?.split("T")[0]) || '',
-      to_date: (event && event.end?.split("T")[0]) || ''
-    },
-    validationSchema: Yup.object({
-      title: Yup.string().required("Please Enter Your Event Name"),
-      from_date: Yup.string().required("Please select from date"),
-      to_date: Yup.string().required("Please select to date"),
-
-    }),
-    onSubmit: (values) => {
-      if (isEdit) {
-        const updateEvent = {
-          id: event.id,
-          title: values.title,
-          // classNames: values.category + " text-white",
-          from_date: values.from_date,
-          to_date: values.to_date
-        };
-        // update event
-        handleEditCalendarSubmit(updateEvent)
-        dispatch(onUpdateEvent(updateEvent));
-        validation.resetForm();
-      } else {
-        const newEvent = {
-          // id: Math.floor(Math.random() * 100),
-          title: values.title,
-          from_date: values.from_date,
-          to_date: values.to_date
-  
-        };
-        // save new event
-        handleAddCalendarSubmit(newEvent);
-        dispatch(onAddNewEvent(newEvent));
-        validation.resetForm();
-
-      }
-      setSelectedDay(null);
-      toggle();
-    },
-  });
-
-  const loadCalendars = async () => {
-    setLoading(true);
-    loadCalendarEvents().then((res) => {
-            setLoading(false);
-      setApiData(res);
-      
-    }).catch((err) => {
-      setLoading(false);
-    })
-  };
-
-  const handleAddCalendarSubmit = (event) => {
-    setLoading(true);
-    addCalendarData1(event).then(res => {
-      setLoading(false);
-      loadCalendars();
-      handleCancel()
-    }).catch(err => {
-      setLoading(false);
-    })
-  };
-
-  const handleEditCalendarSubmit = (event) => {
-    setLoading(true);
-    updateCalendarData(event).then(res => {
-      setLoading(false);
-      loadCalendars();
-      handleCancel()
-    }).catch(err => {
-      setLoading(false);
-    })
-  };
-
-  const handleDeleteCalendarSubmit = (event) => {
-    setLoading(true);
-    deleteCalendarData(event).then(res => {
-      setLoading(false);
-      loadCalendars();
-      handleCancel()
-    }).catch(err => {
-      setLoading(false);
-    })
-  };
-
-  // category validation
-  const categoryValidation = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
-    enableReinitialize: true,
-    initialValues: {
-      title: '',
-      from_date: '',
-      to_date: ''
-      // category: (event && event.category) || '',
-    },
-    validationSchema: Yup.object({
-      title: Yup.string().required("Please Enter Your Event Name"),
-      // category: Yup.string().required("Please Enter Your Billing Name"),
-      from_date: Yup.string().required("Please select from date"),
-      to_date: Yup.string().required("Please select to date"),
-
-    }),
-
-    onSubmit: (values, { resetForm }) => {
-
-      const newEvent = {
-        // id: Math.floor(Math.random() * 100),
-        title: values["title"],
-        from_date: values['from_date'],
-        to_date: values['to_date'],
-
-      };
-      // save new event
-      resetForm();
-      handleAddCalendarSubmit(newEvent);
-      dispatch(onAddNewEvent(newEvent));
-      toggleCategory();
-
-    },
-  });
-
-  const { events, categories } = useSelector(state => ({
-    events: state.calendar.events,
-    categories: state.calendar.categories,
-  }));
-
-  const [modal, setModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [modalcategory, setModalcategory] = useState(false);
-
-  const [selectedDay, setSelectedDay] = useState(0);
-  const [isEdit, setIsEdit] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    dispatch(onGetCategories());
-    dispatch(onGetEvents());
-    new Draggable(document.getElementById("external-events"), {
-      itemSelector: ".external-event",
-    });
-  }, [dispatch]);
-
-  useEffect(() => {
-    loadCalendars();
-  }, []);
-
-  useEffect(() => {
-    if (!modal && !isEmpty(event) && !!isEdit) {
-      setTimeout(() => {
-        setEvent({});
-        setIsEdit(false);
-      }, 500);
+  const addEventFunction = (event: any) => {
+    console.log(event);
+    let newData = {
+      title: event.title,
+      from_date: event.start,
+      to_date: event.end
     }
-  }, [modal, event]);
+    console.log(newData);
+    addCalendarData1(newData);
+    calendarDataAPI();
+  }
 
-  /**
-   * Handling the modal state
-   */
-  const toggle = () => {
-    if (modal) {
-      setModal(false);
-      setIsEdit(false);
-      setEvent(null);
-    } else {
-      setModal(true);
-    }
-  };
-
-  const toggleCategory = () => {
-    setModalcategory(!modalcategory);
-  };
-
-  /**
-   * Handling date click on calendar
-   */
-  const handleDateClick = arg => {
-    const date = arg["date"];
-    const day = date.getDate();
-    const month = date.getMonth();
-    const year = date.getFullYear();
-
-    const currectDate = new Date();
-    const currentHour = currectDate.getHours();
-    const currentMin = currectDate.getMinutes();
-    const currentSec = currectDate.getSeconds();
-    const modifiedDate = new Date(
-      year,
-      month,
-      day,
-      currentHour,
-      currentMin,
-      currentSec
-    );
-    const modifiedData = { ...arg, date: modifiedDate };
-    setEvent({
-      start: modifiedData.dateStr,
-      end: modifiedData.dateStr,
-    });
-    setSelectedDay(modifiedData);
-    toggle();
-  };
-
-  /**
-   * Handling click on event on calendar
-   */
-  const handleEventClick = arg => {
-    const event = arg.event;
-    setEvent({
+  const updateEventFunction = (event: any) => {
+    let newData = {
       id: event.id,
       title: event.title,
-      title_category: event.title_category,
-      start: event.startStr,
-      end: event.endStr ? event.endStr : event.startStr,
-      className: event.classNames,
-      category: event.classNames[0],
-      event_category: event.classNames[0],
-    });
-    setIsEdit(true);
-    toggle();
-  };
-
-  /**
-   * On delete event
-   */
-  const handleDeleteEvent = () => {
-    if (event && event.id) {
-      handleDeleteCalendarSubmit(event)
-      dispatch(onDeleteEvent(event.id));
+      from_date: event.start,
+      to_date: event.end
     }
-    setDeleteModal(false);
-    toggle();
-  };
+    updateCalendarData(newData);
+    calendarDataAPI();
+  }
 
-  /**
-   * On category darg event
-   */
-  const onDrag = event => {
-    event.preventDefault();
-  };
+  const deleteEventFunction = (event: any) => {
+    console.log("dfcgvhb",event);
+    //   //  let id= event.id;
+    deleteCalendarData(event);
+    calendarDataAPI();
 
-  /**
-   * On calendar drop event
-   */
-  const onDrop = event => {
-    const date = event['date'];
-    const day = date.getDate();
-    const month = date.getMonth();
-    const year = date.getFullYear();
+  }
+  // ** Vars
+  const leftSidebarWidth = 300
+  const addEventSidebarWidth = 400
+  const { skin, direction } = settings
+  const mdAbove = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'))
 
-    const currectDate = new Date();
-    const currentHour = currectDate.getHours();
-    const currentMin = currectDate.getMinutes();
-    const currentSec = currectDate.getSeconds();
-    const modifiedDate = new Date(year, month, day, currentHour, currentMin, currentSec);
+  useEffect(() => {
+    dispatch(fetchEvents(store.selectedCalendars as CalendarFiltersType[]))
+  }, [dispatch, store.selectedCalendars])
 
-    const draggedEl = event.draggedEl;
-    const draggedElclass = draggedEl.className;
-    if (draggedEl.classList.contains('external-event') && draggedElclass.indexOf("fc-event-draggable") == -1) {
-      const modifiedData = {
-        id: Math.floor(Math.random() * 100),
-        title: draggedEl.innerText,
-        start: modifiedDate,
-        className: draggedEl.className,
-      };
-      dispatch(onAddNewEvent(modifiedData));
-    }
-  };
+  const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen)
+
+  const handleAddEventSidebarToggle = () => setAddEventSidebarOpen(!addEventSidebarOpen)
+
+  const calendarDataAPI = () => {
+    let result: any = loadCalendarEvents();
+    result.then((res: any) =>
+      setCalenderEvents(res))
+  }
+
+  useEffect(() => {
+    calendarDataAPI();
+  }, [])
 
   return (
-    <React.Fragment>
-      <DeleteModal
-        show={deleteModal}
-        onDeleteClick={handleDeleteEvent}
-        onCloseClick={() => setDeleteModal(false)}
+    <CalendarWrapper
+      className='app-calendar'
+      sx={{
+        boxShadow: skin === 'bordered' ? 0 : 6,
+        ...(skin === 'bordered' && { border: (theme: any) => `1px solid ${theme.palette.divider}` })
+      }}
+    >
+      <SidebarLeft
+        store={store}
+        mdAbove={mdAbove}
+        dispatch={dispatch}
+        calendarApi={calendarApi}
+        calendarsColor={calendarsColor}
+        leftSidebarOpen={leftSidebarOpen}
+        leftSidebarWidth={leftSidebarWidth}
+        handleSelectEvent={handleSelectEvent}
+        handleAllCalendars={handleAllCalendars}
+        handleCalendarsUpdate={handleCalendarsUpdate}
+        handleLeftSidebarToggle={handleLeftSidebarToggle}
+        handleAddEventSidebarToggle={handleAddEventSidebarToggle}
+
       />
-      <div className="page-content">
-        <Container fluid={true}>
-          {/* Render Breadcrumb */}
-          <Breadcrumbs title="Calendar" breadcrumbItem="Full Calendar" />
-          <Row>
-            <Col className="col-12">
-              <Row>
-                <Col lg={3}>
-                  <Card>
-                    <CardBody>
-                      <div className="d-grid">
-                        <Button
-                          color="primary"
-                          className="font-16 btn-block"
-                          onClick={toggleCategory}
-                        >
-                          <i className="mdi mdi-plus-circle-outline me-1" />
-                          Create New Event
-                        </Button>
-                      </div>
+      <Box
+        sx={{
+          p: 6,
+          pb: 0,
+          flexGrow: 1,
+          borderRadius: 1,
+          boxShadow: 'none',
+          backgroundColor: 'background.paper',
+          ...(mdAbove ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } : {})
+        }}
+      >
+        <Calendar
+          store={store}
+          dispatch={dispatch}
+          direction={direction}
+          updateEvent={updateEvent}
+          calendarApi={calendarApi}
+          calendarsColor={calendarsColor}
+          setCalendarApi={setCalendarApi}
+          handleSelectEvent={handleSelectEvent}
+          handleLeftSidebarToggle={handleLeftSidebarToggle}
+          handleAddEventSidebarToggle={handleAddEventSidebarToggle}
+          events={calendarEvents}
+        />
+      </Box>
+      <AddEventSidebar
+        store={store}
+        dispatch={dispatch}
+        addEvent={addEventFunction}
+        updateEvent={updateEventFunction}
+        deleteEvent={deleteEventFunction}
+        calendarApi={calendarApi}
+        drawerWidth={addEventSidebarWidth}
+        handleSelectEvent={handleSelectEvent}
+        addEventSidebarOpen={addEventSidebarOpen}
+        handleAddEventSidebarToggle={handleAddEventSidebarToggle}
+      />
+    </CalendarWrapper>
+  )
+}
 
-                      <div id="external-events" className="mt-2">
-                        <br />
-                        {/* <p className="text-muted">
-                          Drag and drop your event or click in the calendar
-                        </p> */}
-                        {categories &&
-                          categories.map((category, i) => (
-                            <div
-                              className={`${category.type} external-event fc-event text-white`}
-                              key={"cat-" + category.id}
-                              draggable
-                              onDrag={event => onDrag(event, category)}
-                            >
-                              <i className="mdi mdi-checkbox-blank-circle font-size-11 me-2" />
-                              {category.title}
-                            </div>
-                          ))}
-                      </div>
-
-                      <Row className="justify-content-center mt-5">
-                        <img src={verification} alt="" className="img-fluid d-block" />
-                      </Row>
-                    </CardBody>
-                  </Card>
-                </Col>
-                <Col lg={9}>
-                  {/* fullcalendar control */}
-                  <FullCalendar
-                    plugins={[
-                      BootstrapTheme,
-                      dayGridPlugin,
-                      interactionPlugin,
-                    ]}
-                    slotDuration={"00:15:00"}
-                    handleWindowResize={true}
-                    themeSystem="bootstrap"
-                    headerToolbar={{
-                      left: "prev,next today",
-                      center: "title",
-                      right: "dayGridMonth,dayGridWeek,dayGridDay",
-                    }}
-                    events={apiData}
-                    editable={true}
-                    droppable={true}
-                    selectable={true}
-                    dateClick={handleDateClick}
-                    eventClick={handleEventClick}
-                    drop={onDrop}
-                  />
-
-                  {/* New/Edit event modal */}
-                  <Modal
-                    isOpen={modal}
-                    className={props.className}
-                    centered
-                  >
-                    <ModalHeader toggle={toggle} tag="h5" className="py-3 px-4 border-bottom-0">
-                      {!!isEdit ? "Edit Event" : "Add Event"}
-                    </ModalHeader>
-                    <ModalBody className="p-4">
-                      <Form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          validation.handleSubmit();
-                          return false;
-                        }}
-                      >
-                        <Row>
-                          <Col className="col-12">
-                            <div className="mb-3">
-                              <Label className="form-label">Event Name</Label>
-                              <Input
-                                name="title"
-                                type="text"
-                                // value={event ? event.title : ""}
-                                onChange={validation.handleChange}
-                                // onChange={(e) => handleAddCalendarChange(e)}
-                                onBlur={validation.handleBlur}
-                                // defaultValue={editCalendarData.title} 
-                                value={validation.values.title || ""}
-                                invalid={
-                                  validation.touched.title && validation.errors.title ? true : false
-                                }
-                              />
-                              {validation.touched.title && validation.errors.title ? (
-                                <FormFeedback type="invalid">{validation.errors.title}</FormFeedback>
-                              ) : null}
-                            </div>
-                          </Col>
-                          <Col className="col-12">
-                            <div className="mb-3">
-                              <Label className="form-label">From Date :</Label>
-                              <Input
-                                name="from_date"
-                                type="date"
-                                // value={event ? event.title : ""}
-                                onChange={validation.handleChange}
-                                // onChange={(date) => {
-                                //   handleEditDateChange(date);
-                                // }}
-                                onBlur={validation.handleBlur}
-                                value={validation.values.from_date || ""}
-                                invalid={
-                                  validation.touched.from_date && validation.errors.from_date ? true : false
-                                }
-                              />
-                              {validation.touched.from_date && validation.errors.from_date ? (
-                                <FormFeedback type="invalid">{validation.errors.from_date}</FormFeedback>
-                              ) : null}
-                            </div>
-                          </Col>
-
-                          <Col className="col-12">
-                            <div className="mb-3">
-                              <Label className="form-label">To Date :</Label>
-                              <Input
-                                name="to_date"
-                                type="date"
-                                // value={event ? event.title : ""}
-                                onChange={validation.handleChange}
-
-                                // onChange={(date) => {
-                                //   handleEditDateChange1(date);
-                                // }}
-                                onBlur={validation.handleBlur}
-                                value={validation.values.to_date || ""}
-                                invalid={
-                                  validation.touched.to_date && validation.errors.to_date ? true : false
-                                }
-                              />
-                              {validation.touched.to_date && validation.errors.to_date ? (
-                                <FormFeedback type="invalid">{validation.errors.to_date}</FormFeedback>
-                              ) : null}
-                            </div>
-                          </Col>
-
-                          {/* <Col className="col-12">
-                            <div className="mb-3">
-                              <Label className="form-label">Category</Label>
-                              <Input
-                                type="select"
-                                name="category"
-                                // value={event ? event.category : "bg-primary"}
-                                onChange={validation.handleChange}
-                                onBlur={validation.handleBlur}
-                                value={validation.values.category || ""}
-                                invalid={
-                                  validation.touched.category && validation.errors.category ? true : false
-                                }
-                              >
-                                <option value="bg-danger">Danger</option>
-                                <option value="bg-success">Success</option>
-                                <option value="bg-primary">Primary</option>
-                                <option value="bg-info">Info</option>
-                                <option value="bg-dark">Dark</option>
-                                <option value="bg-warning">Warning</option>
-                              </Input>
-                              {validation.touched.category && validation.errors.category ? (
-                                <FormFeedback type="invalid">{validation.errors.category}</FormFeedback>
-                              ) : null}
-                            </div>
-                          </Col> */}
-                        </Row>
-
-                        <Row className="mt-2">
-                          <Col className="col-6">
-                            {!!isEdit && (
-                              <button
-                                type="button"
-                                className="btn btn-danger me-2"
-                                onClick={() => setDeleteModal(true)}
-                              >
-                                Delete
-                              </button>
-                            )}
-                          </Col>
-                          <Col className="col-6 text-end">
-                            <button
-                              type="button"
-                              className="btn btn-light me-2"
-                              onClick={toggle}
-                            >
-                              Close
-                            </button>
-                            <button type="submit"
-                              className="btn btn-success"
-                              id="btn-save-event"
-                              loading={loading}
-                            >
-                              Save
-                            </button>
-                          </Col>
-                        </Row>
-                      </Form>
-                    </ModalBody>
-                  </Modal>
-
-                  <Modal
-                    isOpen={modalcategory}
-                    toggle={toggleCategory}
-                    className={props.className}
-                    centered
-                  >
-                    <ModalHeader toggle={toggleCategory} tag="h5">
-                      Add Event
-                    </ModalHeader>
-                    <ModalBody className="p-4">
-                      <Form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          categoryValidation.handleSubmit();
-                          return false;
-                        }}
-                      >
-                        <Row>
-                          <Col className="col-12">
-                            <div className="mb-3">
-                              <Label className="form-label">Event Name</Label>
-                              <Input
-                                name="title"
-                                type="text"
-                                // value={event ? event.title : ""}
-                                placeholder="Insert Event Name"
-                                onChange={categoryValidation.handleChange}
-                                onBlur={categoryValidation.handleBlur}
-                                value={categoryValidation.values.title || ""}
-                                invalid={
-                                  categoryValidation.touched.title && categoryValidation.errors.title ? true : false
-                                }
-                              />
-                              {categoryValidation.touched.title && categoryValidation.errors.title ? (
-                                <FormFeedback type="invalid">{categoryValidation.errors.title}</FormFeedback>
-                              ) : null}
-                            </div>
-                          </Col>
-
-                          <Col className="col-12">
-                            <div className="mb-3">
-                              <Label className="form-label">From Date : </Label>
-                              <Input
-                                name="from_date"
-                                type="date"
-                                // value={event ? event.title : ""}
-                                // placeholder="Insert Event Name"
-                                onChange={categoryValidation.handleChange}
-                                onBlur={categoryValidation.handleBlur}
-                                value={categoryValidation.values.from_date || ""}
-                                invalid={
-                                  categoryValidation.touched.from_date && categoryValidation.errors.from_date ? true : false
-                                }
-                              />
-                              {categoryValidation.touched.from_date && categoryValidation.errors.from_date ? (
-                                <FormFeedback type="invalid">{categoryValidation.errors.from_date}</FormFeedback>
-                              ) : null}
-                            </div>
-                          </Col>
-
-                          <Col className="col-12">
-                            <div className="mb-3">
-                              <Label className="form-label">To Date : </Label>
-                              <Input
-                                name="to_date"
-                                type="date"
-                                // value={event ? event.title : ""}
-                                // placeholder="Insert Event Name"
-                                selected={addCalendarData.to_date}
-                                onChange={categoryValidation.handleChange}
-                                onBlur={categoryValidation.handleBlur}
-                                value={categoryValidation.values.to_date || ""}
-                                invalid={
-                                  categoryValidation.touched.to_date && categoryValidation.errors.to_date ? true : false
-                                }
-                              />
-                              {categoryValidation.touched.to_date && categoryValidation.errors.to_date ? (
-                                <FormFeedback type="invalid">{categoryValidation.errors.to_date}</FormFeedback>
-                              ) : null}
-                            </div>
-                          </Col>
-                          {/* 
-                          <Col className="col-12">
-                            <div className="mb-3">
-                              <Label className="form-label">Category</Label>
-                              <Input
-                                type="select"
-                                name="category"
-                                placeholder="All Day Event"
-                                onChange={categoryValidation.handleChange}
-                                onBlur={categoryValidation.handleBlur}
-                                value={categoryValidation.values.category || ""}
-                                invalid={
-                                  categoryValidation.touched.category && categoryValidation.errors.category ? true : false
-                                }
-                              >
-                                <option value="bg-danger">Danger</option>
-                                <option value="bg-success">Success</option>
-                                <option value="bg-primary">Primary</option>
-                                <option value="bg-info">Info</option>
-                                <option value="bg-dark">Dark</option>
-                                <option value="bg-warning">Warning</option>
-                              </Input>
-                              {categoryValidation.touched.category && categoryValidation.errors.category ? (
-                                <FormFeedback type="invalid">{categoryValidation.errors.category}</FormFeedback>
-                              ) : null}
-                            </div>
-                          </Col> */}
-                        </Row>
-
-                        <Row className="mt-2">
-                          <Col className="col-6">
-                            <button type="button" className="btn btn-danger" id="btn-delete-event">Delete</button>
-                          </Col>
-                          <Col className="col-6 text-end">
-                            <button
-                              type="button"
-                              className="btn btn-light me-1"
-                              onClick={toggleCategory}
-                            >
-                              Close
-                            </button>
-                            <button
-                              type="submit"
-                              className="btn btn-success"
-                              id="btn-save-event"
-                            >
-                              Save
-                            </button>
-                          </Col>
-                        </Row>
-                      </Form>
-                    </ModalBody>
-                  </Modal>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </Container>
-      </div>
-    </React.Fragment>
-  );
-};
-
-Calender.propTypes = {
-  events: PropTypes.array,
-  categories: PropTypes.array,
-  className: PropTypes.string,
-  onGetEvents: PropTypes.func,
-  onAddNewEvent: PropTypes.func,
-  onUpdateEvent: PropTypes.func,
-  onDeleteEvent: PropTypes.func,
-  onGetCategories: PropTypes.func,
-};
-
-export default Calender;
+export default AppCalendar

@@ -1,0 +1,28 @@
+.stylingImages {
+    width: 100px;
+    border: solid 1px red;
+    margin: 10px;
+  
+  }
+  
+  .selected {
+    width: 100px;
+    border: solid 5px #404bc6;
+    margin: 10px;
+  }
+  
+  .stylingImageTitle {
+    margin: 0px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .stylesHeading {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .displayImages {
+    display: flex;
+    margin-bottom: "25px";
+  flex-wrap: wrap;}

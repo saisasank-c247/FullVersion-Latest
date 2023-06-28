@@ -110,7 +110,7 @@ const SidebarLeft = (props: SidebarLeftType) => {
             '& .react-datepicker': { boxShadow: 'none !important', border: 'none !important' }
           }}
         >
-          <DatePicker inline onChange={date => calendarApi.gotoDate(date)} />
+          <DatePicker inline onChange={(date: any) => calendarApi.gotoDate(date)} />
         </DatePickerWrapper>
         <Divider sx={{ width: '100%', m: '0 !important' }} />
         <Box sx={{ p: 6, width: '100%', display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>

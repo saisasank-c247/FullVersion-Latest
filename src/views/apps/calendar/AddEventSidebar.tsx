@@ -106,9 +106,11 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
       }
     }
     if (store.selectedEvent === null || (store.selectedEvent !== null && !store.selectedEvent.title.length)) {
-      dispatch(addEvent(modifiedEvent))
+      // dispatch(addEvent(modifiedEvent))
+      addEvent(modifiedEvent)
     } else {
-      dispatch(updateEvent({ id: store.selectedEvent.id, ...modifiedEvent }))
+      // dispatch(updateEvent({ id: store.selectedEvent.id, ...modifiedEvent }))
+      updateEvent({ id: store.selectedEvent.id, ...modifiedEvent })
     }
     calendarApi.refetchEvents()
     handleSidebarClose()
@@ -116,7 +118,8 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
 
   const handleDeleteEvent = () => {
     if (store.selectedEvent) {
-      dispatch(deleteEvent(store.selectedEvent.id))
+      // dispatch(deleteEvent(store.selectedEvent.id))
+      deleteEvent(store.selectedEvent.id)
     }
 
     // calendarApi.getEventById(store.selectedEvent.id).remove()
@@ -142,6 +145,7 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
         calendar: event.extendedProps.calendar || 'Business',
         endDate: event.end !== null ? event.end : event.start,
         startDate: event.start !== null ? event.start : new Date()
+      
       })
     }
   }, [setValue, store.selectedEvent])
@@ -159,7 +163,7 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
     }
   }, [addEventSidebarOpen, resetToStoredValues, resetToEmptyValues, store.selectedEvent])
 
-  const PickersComponent = forwardRef(({ ...props }: PickerProps, ref) => {
+  const PickersComponent = forwardRef(({ ...props }: PickerProps, ref:any) => {
     return (
       <CustomTextField
         inputRef={ref}
@@ -264,7 +268,7 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
                 />
               )}
             />
-            <CustomTextField
+            {/* <CustomTextField
               select
               fullWidth
               sx={{ mb: 4 }}
@@ -279,7 +283,7 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
               <MenuItem value='Family'>Family</MenuItem>
               <MenuItem value='Holiday'>Holiday</MenuItem>
               <MenuItem value='ETC'>ETC</MenuItem>
-            </CustomTextField>
+            </CustomTextField> */}
             <Box sx={{ mb: 4 }}>
               <DatePicker
                 selectsStart
@@ -308,15 +312,15 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
                 onChange={(date: Date) => setValues({ ...values, endDate: new Date(date) })}
               />
             </Box>
-            <FormControl sx={{ mb: 4 }}>
+            {/* <FormControl sx={{ mb: 4 }}>
               <FormControlLabel
                 label='All Day'
                 control={
                   <Switch checked={values.allDay} onChange={e => setValues({ ...values, allDay: e.target.checked })} />
                 }
               />
-            </FormControl>
-            <CustomTextField
+            </FormControl> */}
+            {/* <CustomTextField
               fullWidth
               type='url'
               id='event-url'
@@ -325,9 +329,9 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
               value={values.url}
               placeholder='https://www.google.com'
               onChange={e => setValues({ ...values, url: e.target.value })}
-            />
+            /> */}
 
-            <CustomTextField
+            {/* <CustomTextField
               select
               fullWidth
               label='Guests'
@@ -343,8 +347,8 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
               <MenuItem value='diana'>Diana</MenuItem>
               <MenuItem value='john'>John</MenuItem>
               <MenuItem value='barry'>Barry</MenuItem>
-            </CustomTextField>
-            <CustomTextField
+            </CustomTextField> */}
+            {/* <CustomTextField
               rows={4}
               multiline
               fullWidth
@@ -353,7 +357,7 @@ const AddEventSidebar = (props: AddEventSidebarType) => {
               id='event-description'
               value={values.description}
               onChange={e => setValues({ ...values, description: e.target.value })}
-            />
+            /> */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <RenderSidebarFooter />
             </Box>

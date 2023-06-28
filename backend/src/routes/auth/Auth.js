@@ -11,5 +11,6 @@ router.post("/forgot-password", AuthController.requestForgotPassword);
 router.post("/reset-password", AuthController.resetPassword);
 router.get("/verify-password-reset-token", AuthController.verifyResetPasswordToken);
 router.post("/change-password", verifyToken, AuthController.changePassword);
+router.post("/me",verifyToken, AuthController.getProfileDetails);
 
 export default router;

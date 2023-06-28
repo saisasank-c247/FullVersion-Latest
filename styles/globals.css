@@ -15,10 +15,268 @@ code {
   color: #d400ff;
   border-radius: 0.1335rem;
 }
+
 code:not([class*='language-']):before,
 code:not([class*='language-']):after {
   content: '`';
 }
+
 code[class*='language-'] {
   padding: 0;
+}
+
+.stylingImages {
+  width: 100px;
+  border: solid 1px red;
+  margin: 10px;
+
+}
+
+.selected {
+  width: 100px;
+  border: solid 5px #404bc6;
+  margin: 10px;
+}
+
+.stylingImageTitle {
+  margin: 0px;
+  display: flex;
+  justify-content: center;
+}
+
+.stylesHeading {
+  display: flex;
+  justify-content: center;
+}
+
+.displayImages {
+  display: flex;
+  margin-bottom: "25px";
+  flex-wrap: wrap;
+}
+
+.MuiSelect-select.MuiSelect-outlined.MuiInputBase-input.MuiOutlinedInput-input.css-1ukp3w4-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+  padding: 8px !important;
+  color: white;
+}
+
+/* .css-w8116b-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root:not(.MuiInputBase-sizeSmall) {
+width : 185px !important
+} */
+
+.filterEverything {
+  width: 190px !important;
+  color: white !important;
+}
+
+input#standard-bare {
+  padding: 9px;
+}
+
+.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl.MuiInputBase-adornedEnd.css-efyt53-MuiInputBase-root-MuiOutlinedInput-root {
+  margin-top: 3px;
+}
+
+.mediaDiv {
+  display: flex;
+  justify-content: space-between;
+}
+
+.imagesList {
+  grid-template-columns: repeat(6, 1fr) !important;
+  margin-right: 10px;
+}
+
+.resultImageStyle {
+  width: 250px;
+  margin: 15px;
+}
+
+.resultImageDiv {
+  height: 275px;
+}
+.resultDesc{
+  border-top: 1px solid #e0d3d3;
+  margin-top: 85px;
+}
+
+/* .buttonGroup {
+  padding: "10px"; 
+  height: "40px";
+  color: "black";
+  border: "1px solid black"
+} */
+
+/* .allButtons {
+  color: white !important;
+  font-size: 13px !important;
+  height:30px !important;
+  margin: 3px !important;
+  background-color: "#003D4C" !important;
+  border-radius: 0px !important;
+
+}
+.uploadButton{ 
+  width: 80px !important;
+}
+.downloadButton{
+  width: 110px !important;
+}
+.folderButton{
+  width: 151px !important;
+}
+
+.iconStyling {
+  font-size: 18px !important;
+  color: white !important
+} */
+
+.rv-media-header .rv-media-top-header .rv-media-actions .btn {
+  margin-right: 5px;
+}
+
+button.btn.btn-success.js-dropzone-upload.dz-clickable {
+  background-color: #003D4C !important;
+  border-color: #003d4f !important;
+  border-radius: 0;
+  margin-left: 3px;
+}
+
+.MuiFormControl-root.btn.btn-success.js-dropzone-upload.dz-clickable.css-1z0xcs1-MuiFormControl-root {
+  background-color: #003D4C !important;
+  border-color: #003d4f !important;
+  border-radius: 0;
+  margin-left: 3px;
+  margin-top: 0px !important;
+}
+
+.rv-media-container .btn {
+  border-radius: 0;
+  font-size: 13px;
+}
+
+[type=button]:not(:disabled),
+[type=reset]:not(:disabled),
+[type=submit]:not(:disabled),
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+.rv-media-wrapper * {
+  border-radius: 0 !important;
+}
+
+.btn-secondary {
+  background-color: #fff;
+  border-color: #ccc;
+  color: #333;
+}
+
+.btn {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.sortDropdown {
+  border-radius: 0px !important;
+  width: 70px !important;
+}
+
+.actionsDropdown {
+  border-radius: 0px !important;
+  width: 88px !important;
+}
+
+.actionsDropdownDiv {
+  margin-left: -38px !important;
+}
+
+.buttonGroup {
+  margin-left: -30px !important;
+}
+
+.folderIcons {
+  display: flex;
+  justify-content: center;
+  font-size: 100px;
+}
+
+.allCards {
+  /* margin: 15px; */
+  width: 150px;
+  padding-top: 15px;
+  max-width: 345px;
+  border-radius: 0px !important;
+}
+
+.allCardsImages{
+  width: 85px;
+  padding-top: 15px;
+  max-width: 345px;
+  border-radius: 0px !important;
+  height: 85px;
+
+}
+.searchField{
+margin-left: 138px;
+margin-top: 0px !important;
+}
+
+.imagesBox{
+  margin: 15px;
+}
+
+.cardTitle {
+  background-color: #e2e5dd;
+  padding: 5px !important;
+  margin-top: 28px !important;
+  font-size: 13px !important;
+}
+
+.cardTitleInnerText {
+  background-color: #e2e5dd;
+  padding: 5px !important;
+  font-size: 13px !important;
+}
+
+.fullDiv {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.viewInMedia {
+  width: 189px !important;
+}
+
+.actionsDropdown {
+  color: black !important;
+}
+
+.tickIcon {
+  float: right;
+  color: blue;
+  font-size: 20px;
+  margin-left: 5px;
+  margin-top: -9px;
+}
+.resultCardIcon{
+  font-size: 100px;
+  margin: 50px;
+}
+.resultCardImg{
+  margin: 50px;
+  width: 150px;
+}
+
+/* .evenOdd :nth-child(even) {
+
+  background: #ecf0f1;
+} */
+
+.MuiFormGroup-root.css-dmmspl-MuiFormGroup-root:nth-child(odd) {
+  background: #ecf0f1;
+}
+
+.div_hover:hover {
+  background-color: #a7adaf;
 }

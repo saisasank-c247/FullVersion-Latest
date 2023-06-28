@@ -3,6 +3,7 @@ import "regenerator-runtime/runtime";
 import http from "http";
 import express from "express";
 import cors from "cors";
+const mysql = require('mysql');
 import * as bodyParser from "body-parser";
 import router from "./routes";
 import { connect } from "mongoose";
@@ -15,7 +16,30 @@ import { SuperAdminSeeder } from "./seeder";
 dotenv.config();
 const app = express();
 
-const url = process.env.DATABASE_URI;
+var mongo = require('mongodb');
+
+const url = "mongodb://localhost:27017/mytask";
+mongo.connect(url, function (err, db) {
+  if (err) throw err;
+  console.log("Database connected !");
+  db.close();
+});
+
+// const db = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'root',
+//   password: '',
+//   database: 'chapter247',
+// });
+
+// db.connect((err) => {
+//   if (err) {
+//     throw err;
+//   }
+//   console.log('Connected to MySQL database');
+// });
+// app.use(bodyParser.json());
+
 
 connect(url, {
   useNewUrlParser: true,
@@ -52,10 +76,33 @@ app.use(express.static(path.join(__dirname, "..", "assets")));
 app.use(express.static(path.join(__dirname, "..", "build")));
 
 // routes purpose
-app.use("/", router);
+
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use("/", router);
+let json = [];
+app.get("/folder/getAll", function (req, res) {
+  res.json(json)
+})
+app.post("/folder/update", function (req, res) {
+  json = req.body.apiData
+})
+const multer = require("multer");
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/files");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split("/")[1];
+    cb(null, `admin-${file.fieldname}-${Date.now()}.${ext}`);
+  },
+});
+const upload = multer({ storage: multerStorage });
+app.post('/upload', upload.single("myFile"), function (req, res) {
+  res.send(req.file);
+})
 
 // Admin panel build
 app.use("**", (_, res) => {

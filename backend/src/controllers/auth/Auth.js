@@ -1,13 +1,64 @@
-import { UserModel } from "../../models";
+import { LoginModel, UserModel } from "../../models";
 import { Messages, encryptPassword, comparePassword, emailSubjects } from "../../common";
 import jwt from "jsonwebtoken";
 import sendEmail from "../../util/email/sendEmail";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
+// const { User } = require('../models');
+
 
 /**
  * Login API
  */
+// console.log(LoginModel,"loginmodel");
+// const login = async (req, res) => {
+//   const { username, password } = req.body;
+
+//   try {
+//     // Find the user in the database
+//     console.log(LoginModel.findOne)
+//     const user = await LoginModel.findOne({ where: { username } });
+
+//     if (user && user.comparePassword(password)) {
+//       res.status(200).json({ message: 'Login successful' });
+//     } else {
+//       res.status(401).json({ message: 'Invalid credentials' });
+//     }
+//   } catch (err) {
+//     res.status(500).send('Internal Server Error');
+//     console.error('Error finding user:', err);
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+// const login = async (req, res) => {
+//   const { username, password } = req.body;
+
+//   // Perform database query to check if the user exists
+//   const query = `SELECT * FROM login WHERE username = '${username}' AND password ='${password}`;
+//   db.query(query, [username, password], (err, result) => {
+//     if (err) {
+//       res.status(500).send('Internal Server Error');
+//       throw err;
+//     }
+
+//     if (result.length > 0) {
+//       res.status(200).json({ message: 'Login successful' });
+//     } else {
+//       res.status(401).json({ message: 'Invalid credentials' });
+//     }
+//   });
+// };
+
+
 const login = async (req, res) => {
   try {
     const {
@@ -340,11 +391,33 @@ const changePassword = async (req, res) => {
   }
 };
 
+const getProfileDetails = async (req,res) =>{
+  console.log(req.id);
+  const {
+    body: { email, password, isAdmin },
+  } = req;
+  const user = await UserModel.findOne(
+    { id },
+    {
+      firstName: 1,
+      lastName: 1,
+      email: 1,
+      phone: 1,
+      provider: 1,
+      sub: 1,
+      status: 1,
+      password: 1,
+      role: 1
+    }
+  );
+}
+
 export default {
   login,
   signup,
   requestForgotPassword,
   resetPassword,
   verifyResetPasswordToken,
-  changePassword
+  changePassword,
+  getProfileDetails
 }

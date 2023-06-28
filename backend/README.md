@@ -19,3 +19,8 @@
 
 ## Postman API Documentation
 https://documenter.getpostman.com/view/19396794/2s93CLuEpG#deae6c0f-0a86-4ecc-83ea-7503f4d0d7fd
+
+
+## setup process 
+Step1 : `sequelize db:create`
+Step2: 

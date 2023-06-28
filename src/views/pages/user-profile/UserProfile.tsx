@@ -18,10 +18,10 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Type Import
 import {
-  TeamsTabType,
+  // TeamsTabType,
   ProfileTabType,
-  ProjectsTabType,
-  ConnectionsTabType,
+  // ProjectsTabType,
+  // ConnectionsTabType,
   UserProfileActiveTab
 } from 'src/@fake-db/types'
 
@@ -29,10 +29,10 @@ import {
 import Icon from 'src/@core/components/icon'
 
 // ** Demo Components
-import Teams from 'src/views/pages/user-profile/teams'
+// import Teams from 'src/views/pages/user-profile/teams'
 import Profile from 'src/views/pages/user-profile/profile'
-import Projects from 'src/views/pages/user-profile/projects'
-import Connections from 'src/views/pages/user-profile/connections'
+// import Projects from 'src/views/pages/user-profile/projects'
+// import Connections from 'src/views/pages/user-profile/connections'
 import UserProfileHeader from 'src/views/pages/user-profile/UserProfileHeader'
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
@@ -99,9 +99,9 @@ const UserProfile = ({ tab, data }: { tab: string; data: UserProfileActiveTab })
 
   const tabContentList: { [key: string]: ReactElement } = {
     profile: <Profile data={data as ProfileTabType} />,
-    teams: <Teams data={data as TeamsTabType[]} />,
-    projects: <Projects data={data as ProjectsTabType[]} />,
-    connections: <Connections data={data as ConnectionsTabType[]} />
+    // teams: <Teams data={data as TeamsTabType[]} />,
+    // projects: <Projects data={data as ProjectsTabType[]} />,
+    // connections: <Connections data={data as ConnectionsTabType[]} />
   }
 
   return (
@@ -114,7 +114,7 @@ const UserProfile = ({ tab, data }: { tab: string; data: UserProfileActiveTab })
           <TabContext value={activeTab}>
             <Grid container spacing={6}>
               <Grid item xs={12}>
-                <TabList
+                {/* <TabList
                   variant='scrollable'
                   scrollButtons='auto'
                   onChange={handleChange}
@@ -156,7 +156,7 @@ const UserProfile = ({ tab, data }: { tab: string; data: UserProfileActiveTab })
                       </Box>
                     }
                   />
-                </TabList>
+                </TabList> */}
               </Grid>
               <Grid item xs={12}>
                 {isLoading ? (

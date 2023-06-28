@@ -1,5 +1,5 @@
 // ** React Import
-import { useEffect, useRef } from 'react'
+// import { useEffect, useRef } from 'react'
 
 // ** Full Calendar & it's Plugins
 import FullCalendar from '@fullcalendar/react'
@@ -14,6 +14,7 @@ import { CalendarType } from 'src/types/apps/calendarTypes'
 
 // ** Third Party Style Import
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import { useEffect, useRef } from 'react'
 
 const blankEvent = {
   title: '',
@@ -41,7 +42,8 @@ const Calendar = (props: CalendarType) => {
     setCalendarApi,
     handleSelectEvent,
     handleLeftSidebarToggle,
-    handleAddEventSidebarToggle
+    handleAddEventSidebarToggle,
+    events
   } = props
 
   // ** Refs
@@ -55,9 +57,10 @@ const Calendar = (props: CalendarType) => {
   }, [calendarApi, setCalendarApi])
 
   if (store) {
-    // ** calendarOptions(Props)
+    // ** calendarOptions(Props)     
     const calendarOptions = {
-      events: store.events.length ? store.events : [],
+      
+      events: events ? events : [],
       plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, bootstrap5Plugin],
       initialView: 'dayGridMonth',
       headerToolbar: {

@@ -13,8 +13,8 @@ export const verifyToken = async (req, res, next) => {
     // check header or url parameters or post parameters for token
     const token = req.headers["authorization"];
     if (!token || token === undefined) {
-      return res.status(404).json({
-        message: "Token is not provided, or wrong token",
+      return res.status(401).json({
+        message: "Unauthorized token cannot access the resources",
         status: false,
       });
     }
@@ -29,7 +29,7 @@ export const verifyToken = async (req, res, next) => {
         if (err)
           return res
             .status(401)
-            .json({ auth: false, message: "Failed to authenticate token." });
+            .json({ auth: false, message: "Unauthorized token cannot access the resources" });
 
         // if everything is good, save to request for use in other routes
         req.email = decoded.email;

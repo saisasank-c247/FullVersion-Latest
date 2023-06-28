@@ -3,6 +3,8 @@ import { ReactNode, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
+import * as Yup from "yup";
+import { useFormik } from "formik";
 
 // ** MUI Components
 import Button from '@mui/material/Button'
@@ -30,6 +32,8 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
+import { signup } from 'src/pages/apps/calendar/CalendarService';
+import { useRouter } from 'next/router'
 
 // ** Styled Components
 const RegisterIllustration = styled('img')(({ theme }) => ({
@@ -79,11 +83,34 @@ const Register = () => {
   const theme = useTheme()
   const { settings } = useSettings()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
+  const router = useRouter()
 
   // ** Vars
   const { skin } = settings
 
   const imageSource = skin === 'bordered' ? 'auth-v2-register-illustration-bordered' : 'auth-v2-register-illustration'
+  const validation = useFormik({
+    // enableReinitialize : use this flag when initial values needs to be changed
+    enableReinitialize: true,
+
+    initialValues: {
+      email: '',
+      username: '',
+      password: '',
+    },
+    validationSchema: Yup.object({
+      email: Yup.string().required("Please Enter Your Email"),
+      username: Yup.string().required("Please Enter Your Username"),
+      password: Yup.string().required("Please Enter Your Password"),
+    }),
+    onSubmit: (values) => {
+      signup(values);
+      const returnUrl = router.query.returnUrl
+      console.log("returnUrl", returnUrl);
+      const redirectURL = returnUrl && returnUrl !== '/auth/login' ? returnUrl : '/auth/login'
+      router.replace(redirectURL as string)
+    }
+  });
 
   return (
     <Box className='content-right' sx={{ backgroundColor: 'background.paper' }}>
@@ -152,14 +179,26 @@ const Register = () => {
               </Typography>
               <Typography sx={{ color: 'text.secondary' }}>Make your app management easy and fun!</Typography>
             </Box>
-            <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-              <CustomTextField autoFocus fullWidth sx={{ mb: 4 }} label='Username' placeholder='johndoe' />
-              <CustomTextField fullWidth label='Email' sx={{ mb: 4 }} placeholder='user@email.com' />
+            <form noValidate autoComplete='off' onSubmit={(e) => {
+              e.preventDefault();
+              validation.handleSubmit();
+              return false;
+            }}>
+              <CustomTextField name="username" autoFocus fullWidth sx={{ mb: 4 }} label='Username' placeholder='johndoe' onChange={validation.handleChange}
+                onBlur={validation.handleBlur}
+                value={validation.values.username || ""} />
+              <CustomTextField name='email' fullWidth label='Email' sx={{ mb: 4 }} placeholder='user@email.com' onChange={validation.handleChange}
+                onBlur={validation.handleBlur}
+                value={validation.values.email || ""} />
               <CustomTextField
                 fullWidth
                 label='Password'
+                name='password'
                 id='auth-login-v2-password'
                 type={showPassword ? 'text' : 'password'}
+                onChange={validation.handleChange}
+                onBlur={validation.handleBlur}
+                value={validation.values.password || ""}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position='end'>
@@ -191,7 +230,7 @@ const Register = () => {
               </Button>
               <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <Typography sx={{ color: 'text.secondary', mr: 2 }}>Already have an account?</Typography>
-                <Typography component={LinkStyled} href='/login'>
+                <Typography component={LinkStyled} href='/auth/login'>
                   Sign in instead
                 </Typography>
               </Box>

@@ -8,6 +8,8 @@ import email from 'src/store/apps/email'
 import invoice from 'src/store/apps/invoice'
 import calendar from 'src/store/apps/calendar'
 import permissions from 'src/store/apps/permissions'
+// import imageGenerator from 'src/store/apps/image-generator'
+
 
 export const store = configureStore({
   reducer: {
@@ -16,7 +18,8 @@ export const store = configureStore({
     email,
     invoice,
     calendar,
-    permissions
+    permissions,
+    // imageGenerator
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

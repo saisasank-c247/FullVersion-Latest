@@ -3,20 +3,17 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import axios from 'axios'
+import { loadCalendarEvents } from 'src/pages/apps/calendar/CalendarService'
 
 // ** Types
 import { CalendarFiltersType, AddEventType, EventType } from 'src/types/apps/calendarTypes'
 
 // ** Fetch Events
 export const fetchEvents = createAsyncThunk('appCalendar/fetchEvents', async (calendars: CalendarFiltersType[]) => {
-  const response = await axios.get('/apps/calendar/events', {
-    params: {
-      calendars
-    }
-  })
-console.log(response.data);
-
-  return response.data
+  const response = loadCalendarEvents()
+  console.log(response);
+  
+  return []
 })
 
 // ** Add Event

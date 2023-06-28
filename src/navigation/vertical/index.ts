@@ -41,6 +41,26 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'tabler:calendar',
       path: '/apps/calendar'
     },
+    {
+      title: 'Image Generator',
+      icon: 'tabler:calendar',
+      path: '/apps/image-genarator'
+    },
+    {
+      title: 'Users',
+      icon: 'tabler:users',
+      path: '/apps/users'
+    },
+    {
+      title: 'Exam',
+      icon: 'tabler:edit',
+      path: '/apps/exam'
+    },
+    {
+      title: 'Pages',
+      icon: 'tabler:edit',
+      path: '/apps/pages'
+    }
     // {
     //   title: 'Invoice',
     //   icon: 'tabler:file-dollar',

@@ -140,8 +140,7 @@ const UserDropdown = (props: Props) => {
           </Box>
         </MenuItemStyled>
         <MenuItemStyled sx={{ p: 0 }} onClick={() => handleDropdownClose('/pages/account-settings/account')}>
-          <Box sx={styles}>
-            <Icon icon='tabler:settings' />
+          <Box sx={styles}>            <Icon icon='tabler:settings' />
             Settings
           </Box>
         </MenuItemStyled>
