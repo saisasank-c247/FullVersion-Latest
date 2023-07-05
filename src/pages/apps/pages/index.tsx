@@ -1,4 +1,5 @@
-import ListPage from "src/views/apps/pages/ListPage"
+import ListPage  from "src/views/apps/pages/ListPage"
+
 
 const ListPageIndex = () => {
     return (

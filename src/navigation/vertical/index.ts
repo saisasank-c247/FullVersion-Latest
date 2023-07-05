@@ -60,6 +60,11 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Pages',
       icon: 'tabler:edit',
       path: '/apps/pages'
+    },
+    {
+      title: 'CreatePage',
+      icon: 'tabler:edit',
+      path: '/apps/createpage'
     }
     // {
     //   title: 'Invoice',

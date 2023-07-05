@@ -16,7 +16,7 @@ const WindowWrapper = ({ children }: Props) => {
 
   useEffect(
     () => {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' ) {
         setWindowReadyFlag(true)
       }
     },

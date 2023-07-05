@@ -87,6 +87,7 @@ app.get("/folder/getAll", function (req, res) {
 })
 app.post("/folder/update", function (req, res) {
   json = req.body.apiData
+  res.json(json)
 })
 const multer = require("multer");
 

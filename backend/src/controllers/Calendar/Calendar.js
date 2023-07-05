@@ -34,6 +34,7 @@ async function updateEvent(request,response){
 }
 
 async function removeEvent(request,response){
+    console.log("request",request.params);
     try {
         await CalendarEventModel.findByIdAndDelete(request.params.id);
         response.status(200).send();
@@ -41,6 +42,7 @@ async function removeEvent(request,response){
         response.status(500).send(error);
       }
 }
+
 module.exports = {
     getEvents,
     insertEvent,
