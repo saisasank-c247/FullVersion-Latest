@@ -18,12 +18,14 @@ import Icon from 'src/@core/components/icon'
 import { ThemeColor } from 'src/@core/layouts/types'
 // ** Styled Component
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import { Card, CardContent, FormControl, MenuItem, SelectChangeEvent, Select } from '@mui/material'
+import { Card, CardContent, FormControl, MenuItem, SelectChangeEvent, Select, Modal } from '@mui/material'
 import { Label } from 'recharts'
 import { useFormik } from 'formik'
 import React from 'react'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { SidebarRightType } from 'src/types/apps/pageTypes'
+import axios from 'axios'
+import AddImage from './AddImage'
 
 const SideBarRight = (props: any) => {
     const { submitForm } = props;
@@ -31,14 +33,46 @@ const SideBarRight = (props: any) => {
     const [template, setTemplate] = React.useState(props.template || 'BlogSidebar');
     const [image, setImage] = React.useState(props.image || '');
 
+    const [openModal, setOpenModal] = React.useState(false);
+    const handleInsertOpen = () => setOpenModal(true);
+    const handleInsertClose = () => setOpenModal(false);
+    const [activeSelectedItem, setActiveSelectedItem] = React.useState()
+    const [editorimg, setEditorimg] = React.useState('');
+
+    const dataInsert=(e : any)=>{
+        setActiveSelectedItem(e); 
+        handleInsertClose();
+        setImage(e.url)
+        console.log(e , image, "dskfb");
+        
+    let linkTag = "<a href='" + e.url + "'>" + e.url  + "</a>";
+      let imgTag ="<img width='200px' src='" + e.url + "'/>"
+        let code = e.type == "image/png" ? imgTag: linkTag
+         setEditorimg(editorimg + code) 
+      }
+      const style = {
+        position: 'absolute' as 'absolute',
+        top: '50%',
+        left: '55%',
+        transform: "translate(-50%, -50%)",
+        width: "70%",
+        bgcolor: "#FFF",
+        border: '2px solid #000',
+        boxShadow: "0px 10px 30px 0px rgba(47, 43, 61, 0.34)",
+        padding: "1rem",
+        height: "85vh",
+      };
+      const handleEditorChange = (e: any) => {
+        setEditorimg(e);
+       }
     return (
-        <div style={{ display: "flex", flexDirection: "column", justifyContent:"center",alignItems:"flex-end" }}>
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-end" }}>
             <Card sx={{ width: "100%" }} square>
                 <CardContent>
                     <Typography variant='h6' sx={{ color: "darkblue" }}>Publish</Typography>
                     <Divider />
-                    <div style={{display:"flex",justifyContent:"center",alignItems:"center"}}>
-                    <Button variant="contained" size="small" type="button" onClick={() => submitForm(status, template, image)} style={{ marginTop: "10px",  }} startIcon={<SaveIcon />}>Save & Exit</Button>
+                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                        <Button variant="contained" size="small" type="button" onClick={() => submitForm(status, template, image)} style={{ marginTop: "10px", }} startIcon={<SaveIcon />}>Save & Exit</Button>
                     </div>
                 </CardContent>
             </Card>
@@ -104,7 +138,7 @@ const SideBarRight = (props: any) => {
                     <label style={{ color: "darkblue", width: "100%", display: "flex", marginTop: "2px" }}>Image</label>
                     <Divider />
                     <div >
-                        <img src={image?image:"https://www.freeiconspng.com/thumbs/photography-icon-png/photo-album-icon-png-14.png"} height="177px" width="179px" />
+                    <img src={image ? image : "https://www.freeiconspng.com/thumbs/photography-icon-png/photo-album-icon-png-14.png"} height="177px" width="179px" value={editorimg} onChange={(e) => handleEditorChange(e)} />
                     </div>
                     <div style={{
                         display: 'flex',
@@ -112,16 +146,21 @@ const SideBarRight = (props: any) => {
                         flexWrap: 'wrap',
                     }}>
 
-                        <input
-                            type="file"
-                            accept="image/*"
-                            style={{ display: 'none' }}
-                            id="contained-button-file"
-                        />
+
                         <label htmlFor="contained-button-file">
-                            <Button color="primary" component="span" sx={{ borderColor: "white", color: "#337ab7" }}>
+                            <Button color="primary" component="span" sx={{ borderColor: "white", color: "#337ab7" }} onClick={handleInsertOpen}>
                                 Choose a file
                             </Button>
+                            <Modal
+                                open={openModal}
+                                onClose={handleInsertClose}
+                                aria-labelledby="modal-modal-title"
+                                aria-describedby="modal-modal-description"
+                            >
+                                <Box sx={style}>
+                                    <AddImage activeSelectedItem={(e: any) => dataInsert(e)} />
+                                </Box>
+                            </Modal>
                         </label>
 
                     </div>

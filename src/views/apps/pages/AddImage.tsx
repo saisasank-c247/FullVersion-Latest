@@ -25,7 +25,7 @@ import { faArrowDown19, faArrowDownAZ, faArrowDownZA, faArrowUpAZ, faCircleCheck
 import CustomTextField from 'src/@core/components/mui/text-field';
 import { url } from 'inspector';
 import { color } from '@mui/system';
-import * as moment from "moment";
+import moment from "moment";
 import axios from 'axios';
 import WindowIcon from '@mui/icons-material/Window';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
@@ -160,16 +160,6 @@ const AddImage = (props: any) => {
         setOpen(false)
     }
     const backward = [{ name: "back", type: "back" }];
-    // React.useEffect(() => {
-    //     // console.log(searchResults, "search");
-
-    //     // const result = apiData.filter((item: any) => {
-    //     //     console.log(item.name, "dsfs");
-
-    //     //     item.name.toLowerCase().includes(searchResults)
-    //     // });
-    //     // setSearchResults(result);
-    // }, [1])
 
     const createFolder = () => {
         let name = folderName;
@@ -192,7 +182,9 @@ const AddImage = (props: any) => {
 
     const storeFile = (file: any) => {
         let tmp = [...cloneApiData];
-        console.log({ directions })
+        console.log("tmp",tmp);
+        
+        console.log({ directions } , {file})
         if (tmp[directions[0]]) {
             if (tmp[directions[0]].files[directions[1]]) {
                 if (tmp[directions[0]].files[directions[1]].files[directions[2]]) {
@@ -213,9 +205,11 @@ const AddImage = (props: any) => {
     };
 
     const changeApiData = (apiData: any) => {
+        setLoading(true)
         axios.post("http://localhost:8000/folder/update", {
             apiData
         }).then(res => {
+            setLoading(false)
             console.log(res, "*****");
         })
     }
@@ -238,13 +232,9 @@ const AddImage = (props: any) => {
         setResultType(val.type);
     }
 
-
     const handleInsert = () => {
         props.activeSelectedItem(activeItem)
             let src = props.activeSelectedItem?.url
-
-
-    // setEditorimg(editorImg + "<img src='" + src + "'/>")
     }
     console.log(activeImgUrl, "activeImgUrl")
 
@@ -282,7 +272,6 @@ const AddImage = (props: any) => {
             }
             return 0; // names are equal
         });
-        // console.log(itemDataClone);
         if (isDes) {
             itemDataClone.reverse();
         }
@@ -294,8 +283,6 @@ const AddImage = (props: any) => {
         setSelectedFile(event.target.files[0]);
         const formData = new FormData();
         formData.append('myFile', event.target.files[0]);
-        // formData.append('name', selectedFile.name);
-        // formData.append('type', selectedFile.type);
         console.log(formData)
         console.log("selectedFile", selectedFile);
         setLoading(true)
@@ -308,18 +295,23 @@ const AddImage = (props: any) => {
             .then(function (response) {
                 //handle success
                 setLoading(false);
-                console.log(response);
+                console.log(response , "ksdfgh");
+                setTimeout(() => {
+                    let data = storeFile({
+                        id: apiData.length ? apiData[apiData.length - 1]['id'] + 1 : 0,
+                        name: response.data.filename,
+                        type: response.data.mimetype,
+                        createdAt: moment().format("DD-MM-YYYY HH:MM"),
+                        size: response.data.size,
+                        url: "http://localhost:8000/files/" + response.data.filename
+                    })
+                    console.log("dta", data);
+                    
+                    setApiData(generateSizes(getFoldersGenerated([...data])));
+                    changeApiData([...data]);
+                }, 500);
                 // response.data.filename
-                let data = storeFile({
-                    id: apiData.length ? apiData[apiData.length - 1]['id'] + 1 : 0,
-                    name: response.data.filename,
-                    type: response.data.mimetype,
-                    createdAt: moment().format("DD-MM-YYYY HH:MM"),
-                    size: response.data.size,
-                    url: "http://localhost:8000/files/" + response.data.filename
-                })
-                setApiData(generateSizes(getFoldersGenerated([...data])));
-                changeApiData(data);
+                
             })
             .catch(function (response) {
                 //handle error
@@ -380,13 +372,9 @@ const AddImage = (props: any) => {
     }
 
     const getFoldersGenerated = (value: any) => {
-        // console.log("***", value);
-        // console.log("directions***", directions);
-        // console.log(value[directions[directions.length - 1]]?.files, "****");
 
         let result = value;
         if (directions.length) {
-            // console.log(value[directions[value.length]] , "****");
             directions.forEach((i: any) => {
                 console.log(result, "jhgf", apiData[i]);
 
@@ -397,10 +385,10 @@ const AddImage = (props: any) => {
         return value
     }
     const generateDirections = (item: any, index: any) => {
-        console.log("hii*****", item, index);
+        // console.log("hii*****", item, index);
         if (item.type == "folder") {
             setDirections([...directions, index]);
-            console.log(apiData[index].files, "*********", index);
+            // console.log(apiData[index].files, "*********", index);
             //   setApiData([...backward, ...item.files]);
             setApiData(generateSizes(apiData[index].files));
         }
@@ -493,7 +481,7 @@ const AddImage = (props: any) => {
 
     return (
         <>
-            {loading ? <div class="loading">Loading&#8230;</div> : null}
+            {loading ? <div className="loading">Loading&#8230;</div> : null}
             {/* <Dialog open={true} fullWidth maxWidth="sm" sx={{"display":"flex","justify-content":"center"}}>
                 <CircularProgress/>
             </Dialog> */}
